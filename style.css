@@ -5,6 +5,15 @@
     --card-bg: #ffffff;
     --text: #333;
     --shadow: 0 4px 15px rgba(0,0,0,0.1);
+    --border: #ddd;
+}
+
+[data-theme="dark"] {
+    --bg: #121212;
+    --card-bg: #1e1e1e;
+    --text: #e0e0e0;
+    --shadow: 0 4px 15px rgba(0,0,0,0.5);
+    --border: #333;
 }
 
 body {
@@ -16,6 +25,7 @@ body {
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 header {
@@ -52,6 +62,17 @@ h1 {
     overflow: hidden;
 }
 
+/* Theme Toggle */
+.theme-toggle {
+    position: absolute;
+    right: 1rem;
+    cursor: pointer;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    padding: 0.5rem;
+}
+
 /* Forms */
 form {
     display: flex;
@@ -67,9 +88,11 @@ form {
 
 input, select {
     padding: 0.8rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 1rem;
+    background: var(--card-bg);
+    color: var(--text);
 }
 
 button {
@@ -79,7 +102,7 @@ button {
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
-    transition: transform 0.1s;
+    transition: all 0.2s ease;
 }
 
 button:active {
@@ -97,13 +120,23 @@ button:active {
 }
 
 /* Swiper UI */
-.swiper-card {
+.swiper-wrapper {
     position: relative;
+    width: 100%;
     height: 600px;
+    perspective: 1000px;
+}
+
+.swiper-card {
+    position: absolute;
+    width: 100%;
+    height: 100%;
     border-radius: 20px;
     overflow: hidden;
     background: #000;
     color: white;
+    cursor: grab;
+    transition: transform 0.5s ease, opacity 0.5s ease;
 }
 
 .swiper-card img {
@@ -121,10 +154,43 @@ button:active {
     background: linear-gradient(transparent, rgba(0,0,0,0.8));
 }
 
+/* Gallery Indicators */
+.gallery-dots {
+    position: absolute;
+    top: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    z-index: 10;
+}
+
+.dot {
+    width: 30px;
+    height: 4px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 2px;
+}
+
+.dot.active {
+    background: white;
+}
+
+/* Animations */
+.swipe-left {
+    transform: translateX(-150%) rotate(-30deg) !important;
+    opacity: 0;
+}
+
+.swipe-right {
+    transform: translateX(150%) rotate(30deg) !important;
+    opacity: 0;
+}
+
 .swiper-actions {
     display: flex;
     justify-content: space-around;
-    padding: 1rem 0;
+    padding: 1.5rem 0;
     width: 100%;
 }
 
@@ -136,12 +202,14 @@ button:active {
     justify-content: center;
     align-items: center;
     font-size: 1.5rem;
-    background: white;
+    background: var(--card-bg);
     box-shadow: var(--shadow);
+    border: none;
+    color: var(--text);
 }
 
-.like { color: #2ecc71; }
-.dislike { color: #e74c3c; }
+.like { color: #2ecc71; border: 2px solid #2ecc71; }
+.dislike { color: #e74c3c; border: 2px solid #e74c3c; }
 
 /* Home menu */
 .menu-btns {
@@ -174,7 +242,7 @@ button:active {
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border);
 }
 
 .match-item img {
@@ -184,26 +252,56 @@ button:active {
     object-fit: cover;
 }
 
-/* Home button in header */
 .home-btn {
     position: absolute;
     left: 1rem;
     text-decoration: none;
-    background: var(--bg);
+    background: var(--card-bg);
     width: 40px;
     height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 50%;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow);
     font-size: 1.2rem;
     transition: all 0.2s ease;
+    color: var(--text);
 }
 
 .home-btn:hover {
     background: var(--primary);
     color: white !important;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.meeting-info {
+    background: rgba(46, 204, 113, 0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    border-left: 4px solid #2ecc71;
+}
+
+/* Filters and Sorting */
+.filters-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+}
+
+.filter-item {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.8rem;
+}
+
+.filter-item input, .filter-item select {
+    padding: 0.4rem;
+    font-size: 0.8rem;
 }

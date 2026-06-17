@@ -28,6 +28,13 @@ const Storage = {
         meetings.push({ profileId, address });
         Storage.saveMeetings(meetings);
         Storage.updateProfileStatus(profileId, 'matched');
+    },
+
+    // Theme management
+    getTheme: () => localStorage.getItem('theme') || 'light',
+    setTheme: (theme) => {
+        localStorage.setItem('theme', theme);
+        document.documentElement.setAttribute('data-theme', theme);
     }
 };
 
@@ -41,3 +48,36 @@ function createHTMLElement(tag, props = {}, children = []) {
     });
     return el;
 }
+
+// Notifications Helper
+const Notifications = {
+    requestPermission: () => {
+        if ("Notification" in window) {
+            Notification.requestPermission();
+        }
+    },
+    send: (title, body) => {
+        if ("Notification" in window && Notification.permission === "granted") {
+            new Notification(title, { body });
+        }
+    }
+};
+
+// Initialize Theme
+Storage.setTheme(Storage.getTheme());
+
+// Add Theme Toggle UI
+document.addEventListener('DOMContentLoaded', () => {
+    const header = document.querySelector('header');
+    if (header) {
+        const toggle = createHTMLElement('button', { 
+            className: 'theme-toggle',
+            onclick: () => {
+                const newTheme = Storage.getTheme() === 'light' ? 'dark' : 'light';
+                Storage.setTheme(newTheme);
+                toggle.textContent = newTheme === 'light' ? '🌙' : '☀️';
+            }
+        }, [Storage.getTheme() === 'light' ? '🌙' : '☀️']);
+        header.appendChild(toggle);
+    }
+});

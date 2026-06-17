@@ -30,6 +30,11 @@ Pour tester le flux complet, nous vous recommandons d'ouvrir deux onglets côte 
 *   Cliquez sur **Accepter**. Une fenêtre surgissante vous demandera de saisir une **adresse de rendez-vous**.
 *   Une fois l'adresse saisie, le Swiper verra instantanément l'adresse s'afficher dans sa section "Matchs Confirmés".
 
-## 🛠 Détails Techniques
-*   **Stockage :** L'application utilise le `localStorage` du navigateur. Les données sont persistantes sur votre machine tant que vous ne videz pas le cache du navigateur.
-*   **Communication :** La synchronisation entre les onglets est automatique (rafraîchissement toutes les 5 secondes pour les listes de matchs).
+## ✨ Nouvelles Fonctionnalités Premium
+
+*   **🌙 Mode Sombre :** Basculez entre le mode clair et sombre via le bouton ☀️/🌙 dans l'en-tête.
+*   **📸 Upload Multiple :** Le posteur peut désormais charger plusieurs photos directement depuis son ordinateur.
+*   **🖼️ Galerie Interactive :** Dans l'interface Swiper, cliquez à gauche ou à droite de la photo pour faire défiler la galerie.
+*   **⚡ Animations de Swipe :** Effets visuels fluides lors du like ou du dislike.
+*   **🔍 Filtres & Tri :** Filtrez les profils par sexe, âge, et triez-les par "Indicateur de Beauté" (Prix).
+*   **🔔 Notifications Push :** Recevez une notification de navigateur dès qu'un match est confirmé (si autorisé).

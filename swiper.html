@@ -13,14 +13,42 @@
     </header>
 
     <div class="container">
-        <div id="swiperContainer">
+        <!-- Filters Bar -->
+        <div class="filters-bar">
+            <div class="filter-item">
+                <label>Sexe</label>
+                <select id="filterGender" onchange="loadProfiles()">
+                    <option value="All">Tous</option>
+                    <option value="Femme">Femmes</option>
+                    <option value="Homme">Hommes</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label>Âge Min</label>
+                <input type="number" id="filterAgeMin" value="18" min="18" onchange="loadProfiles()">
+            </div>
+            <div class="filter-item">
+                <label>Âge Max</label>
+                <input type="number" id="filterAgeMax" value="100" min="18" onchange="loadProfiles()">
+            </div>
+            <div class="filter-item">
+                <label>Trier par Beauté</label>
+                <select id="sortPrice" onchange="loadProfiles()">
+                    <option value="none">Défaut</option>
+                    <option value="desc">Prix Décroissant</option>
+                    <option value="asc">Prix Croissant</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="swiperContainer" class="swiper-wrapper">
             <!-- Dynamically populated card -->
             <div id="activeCard"></div>
-            
-            <div class="swiper-actions">
-                <button class="action-btn dislike" onclick="handleSwipe('dislike')">✖</button>
-                <button class="action-btn like" onclick="handleSwipe('like')">❤</button>
-            </div>
+        </div>
+        
+        <div class="swiper-actions">
+            <button class="action-btn dislike" onclick="animateSwipe('dislike')">✖</button>
+            <button class="action-btn like" onclick="animateSwipe('like')">❤</button>
         </div>
 
         <div id="confirmedMatches">
@@ -31,48 +59,121 @@
 
     <script src="app.js"></script>
     <script>
-        let currentProfile = null;
+        let currentProfiles = [];
+        let currentIndex = 0;
+        let currentImageIndex = 0;
+        let knownConfirmedMatchesCount = 0;
 
-        function loadNextProfile() {
-            const profiles = Storage.getProfiles().filter(p => p.status === 'available');
+        // Initialize Notifications
+        Notifications.requestPermission();
+
+        function loadProfiles() {
+            const gender = document.getElementById('filterGender').value;
+            const ageMin = parseInt(document.getElementById('filterAgeMin').value);
+            const ageMax = parseInt(document.getElementById('filterAgeMax').value);
+            const sort = document.getElementById('sortPrice').value;
+
+            let profiles = Storage.getProfiles().filter(p => 
+                p.status === 'available' &&
+                (gender === 'All' || p.gender === gender) &&
+                p.age >= ageMin &&
+                p.age <= ageMax
+            );
+
+            if (sort === 'asc') profiles.sort((a, b) => a.price - b.price);
+            if (sort === 'desc') profiles.sort((a, b) => b.price - a.price);
+
+            currentProfiles = profiles;
+            currentIndex = 0;
+            renderActiveCard();
+        }
+
+        function renderActiveCard() {
             const cardContainer = document.getElementById('activeCard');
+            const actions = document.querySelector('.swiper-actions');
             
-            if (profiles.length === 0) {
-                currentProfile = null;
+            if (currentProfiles.length === 0 || currentIndex >= currentProfiles.length) {
                 cardContainer.innerHTML = `
-                    <div class="card" style="text-align: center; padding: 3rem;">
-                        <p>Plus de profils disponibles pour le moment !</p>
-                        <small>Revenez plus tard ou demandez au Posteur d'en ajouter.</small>
+                    <div class="card" style="text-align: center; padding: 3rem; width:100%">
+                        <p>Aucun profil ne correspond à vos critères !</p>
+                        <small>Modifiez vos filtres ou revenez plus tard.</small>
                     </div>
                 `;
-                document.querySelector('.swiper-actions').style.display = 'none';
+                actions.style.display = 'none';
                 return;
             }
 
-            document.querySelector('.swiper-actions').style.display = 'flex';
-            currentProfile = profiles[0];
+            actions.style.display = 'flex';
+            const profile = currentProfiles[currentIndex];
+            currentImageIndex = 0;
             
             cardContainer.innerHTML = `
-                <div class="swiper-card">
-                    <img src="${currentProfile.imageUrl}" onerror="this.src='https://via.placeholder.com/400x600?text=Image+Non+Valide'">
+                <div class="swiper-card" id="currentCard" onclick="handleImageClick(event)">
+                    <div class="gallery-dots" id="galleryDots"></div>
+                    <img id="cardImg" src="${profile.images[0]}">
                     <div class="swiper-info">
-                        <h2>${currentProfile.gender}, ${currentProfile.age}</h2>
-                        <p>📍 ${currentProfile.location} | 📏 ${currentProfile.height}cm</p>
-                        <p>💎 Beauté : ${currentProfile.price} €</p>
+                        <h2>${profile.gender}, ${profile.age}</h2>
+                        <p>📍 ${profile.location} | 📏 ${profile.height}cm</p>
+                        <p>💎 Beauté : ${profile.price} €</p>
                     </div>
                 </div>
             `;
+            updateGalleryDots();
+        }
+
+        function handleImageClick(e) {
+            const profile = currentProfiles[currentIndex];
+            if (!profile || profile.images.length <= 1) return;
+
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+
+            if (x < rect.width / 2) {
+                // Click left
+                currentImageIndex = (currentImageIndex - 1 + profile.images.length) % profile.images.length;
+            } else {
+                // Click right
+                currentImageIndex = (currentImageIndex + 1) % profile.images.length;
+            }
+
+            document.getElementById('cardImg').src = profile.images[currentImageIndex];
+            updateGalleryDots();
+        }
+
+        function updateGalleryDots() {
+            const profile = currentProfiles[currentIndex];
+            const dotsContainer = document.getElementById('galleryDots');
+            dotsContainer.innerHTML = '';
+            
+            profile.images.forEach((_, index) => {
+                const dot = createHTMLElement('div', { 
+                    className: `dot ${index === currentImageIndex ? 'active' : ''}` 
+                });
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        function animateSwipe(action) {
+            const card = document.getElementById('currentCard');
+            if (!card) return;
+
+            card.classList.add(action === 'like' ? 'swipe-right' : 'swipe-left');
+
+            setTimeout(() => {
+                handleSwipe(action);
+            }, 500);
         }
 
         function handleSwipe(action) {
-            if (!currentProfile) return;
+            const profile = currentProfiles[currentIndex];
+            if (!profile) return;
 
             if (action === 'like') {
-                Storage.updateProfileStatus(currentProfile.id, 'liked');
-                alert('Match envoyé ! En attente de validation par le posteur...');
+                Storage.updateProfileStatus(profile.id, 'liked');
             }
             
-            loadNextProfile();
+            currentIndex++;
+            renderActiveCard();
         }
 
         function renderConfirmedMatches() {
@@ -80,13 +181,19 @@
             const meetings = Storage.getMeetings();
             const list = document.getElementById('confirmedList');
             
+            // Notification check
+            if (profiles.length > knownConfirmedMatchesCount) {
+                Notifications.send("Nouveau Match !", "Un posteur a accepté votre match et donné une adresse !");
+                knownConfirmedMatchesCount = profiles.length;
+            }
+
             list.innerHTML = profiles.length === 0 ? '<p>Aucun match confirmé.</p>' : '';
             
             profiles.forEach(profile => {
                 const meeting = meetings.find(m => m.profileId === profile.id);
                 const item = createHTMLElement('div', { className: 'card' }, [
                     createHTMLElement('div', { className: 'match-item', style: 'border:none' }, [
-                        createHTMLElement('img', { src: profile.imageUrl }),
+                        createHTMLElement('img', { src: profile.images[0] }),
                         createHTMLElement('div', {}, [
                             createHTMLElement('b', {}, [`Match avec ${profile.gender}`]),
                             createHTMLElement('div', { className: 'meeting-info' }, [
@@ -100,9 +207,8 @@
             });
         }
 
-        loadNextProfile();
+        loadProfiles();
         renderConfirmedMatches();
-        // Refresh confirmed matches every 5 seconds
         setInterval(renderConfirmedMatches, 5000);
     </script>
 </body>
