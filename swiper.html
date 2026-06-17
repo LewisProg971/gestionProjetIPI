@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interface Swiper</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <a href="index.html" style="position: absolute; left: 1rem; text-decoration: none;">🏠</a>
+        <h1>🔥 Swiper</h1>
+    </header>
+
+    <div class="container">
+        <div id="swiperContainer">
+            <!-- Dynamically populated card -->
+            <div id="activeCard"></div>
+            
+            <div class="swiper-actions">
+                <button class="action-btn dislike" onclick="handleSwipe('dislike')">✖</button>
+                <button class="action-btn like" onclick="handleSwipe('like')">❤</button>
+            </div>
+        </div>
+
+        <div id="confirmedMatches">
+            <h3>Mes Matchs Confirmés</h3>
+            <div id="confirmedList"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let currentProfile = null;
+
+        function loadNextProfile() {
+            const profiles = Storage.getProfiles().filter(p => p.status === 'available');
+            const cardContainer = document.getElementById('activeCard');
+            
+            if (profiles.length === 0) {
+                currentProfile = null;
+                cardContainer.innerHTML = `
+                    <div class="card" style="text-align: center; padding: 3rem;">
+                        <p>Plus de profils disponibles pour le moment !</p>
+                        <small>Revenez plus tard ou demandez au Posteur d'en ajouter.</small>
+                    </div>
+                `;
+                document.querySelector('.swiper-actions').style.display = 'none';
+                return;
+            }
+
+            document.querySelector('.swiper-actions').style.display = 'flex';
+            currentProfile = profiles[0];
+            
+            cardContainer.innerHTML = `
+                <div class="swiper-card">
+                    <img src="${currentProfile.imageUrl}" onerror="this.src='https://via.placeholder.com/400x600?text=Image+Non+Valide'">
+                    <div class="swiper-info">
+                        <h2>${currentProfile.gender}, ${currentProfile.age}</h2>
+                        <p>📍 ${currentProfile.location} | 📏 ${currentProfile.height}cm</p>
+                        <p>💎 Beauté : ${currentProfile.price} €</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleSwipe(action) {
+            if (!currentProfile) return;
+
+            if (action === 'like') {
+                Storage.updateProfileStatus(currentProfile.id, 'liked');
+                alert('Match envoyé ! En attente de validation par le posteur...');
+            }
+            
+            loadNextProfile();
+        }
+
+        function renderConfirmedMatches() {
+            const profiles = Storage.getProfiles().filter(p => p.status === 'matched');
+            const meetings = Storage.getMeetings();
+            const list = document.getElementById('confirmedList');
+            
+            list.innerHTML = profiles.length === 0 ? '<p>Aucun match confirmé.</p>' : '';
+            
+            profiles.forEach(profile => {
+                const meeting = meetings.find(m => m.profileId === profile.id);
+                const item = createHTMLElement('div', { className: 'card' }, [
+                    createHTMLElement('div', { className: 'match-item', style: 'border:none' }, [
+                        createHTMLElement('img', { src: profile.imageUrl }),
+                        createHTMLElement('div', {}, [
+                            createHTMLElement('b', {}, [`Match avec ${profile.gender}`]),
+                            createHTMLElement('div', { className: 'meeting-info' }, [
+                                createHTMLElement('strong', {}, ['📍 Adresse de RDV : ']),
+                                createHTMLElement('span', {}, [meeting ? meeting.address : 'En attente...'])
+                            ])
+                        ])
+                    ])
+                ]);
+                list.appendChild(item);
+            });
+        }
+
+        loadNextProfile();
+        renderConfirmedMatches();
+        // Refresh confirmed matches every 5 seconds
+        setInterval(renderConfirmedMatches, 5000);
+    </script>
+</body>
+</html>
