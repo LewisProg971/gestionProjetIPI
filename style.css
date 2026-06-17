@@ -184,10 +184,26 @@ button:active {
     object-fit: cover;
 }
 
-.meeting-info {
-    background: #e8f5e9;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-top: 1rem;
-    border-left: 4px solid #2ecc71;
+/* Home button in header */
+.home-btn {
+    position: absolute;
+    left: 1rem;
+    text-decoration: none;
+    background: var(--bg);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+}
+
+.home-btn:hover {
+    background: var(--primary);
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
