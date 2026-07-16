@@ -252,6 +252,13 @@ button:active {
     object-fit: cover;
 }
 
+.logo {
+    height: 50px;
+    width: auto;
+    margin-right: 1rem;
+    object-fit: contain;
+}
+
 .home-btn {
     position: absolute;
     left: 1rem;
