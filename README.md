@@ -1,4 +1,4 @@
-# Maquette Tinder-like (Fonctionnelle)
+# Maquette Tin-Die (Fonctionnelle)
 
 Cette application est une maquette interactive permettant de simuler deux rôles : un **Posteur** qui dépose des offres de profils, et un **Swiper** qui consulte et matche ces offres.
 
