@@ -31,10 +31,9 @@ const Storage = {
     },
 
     // Theme management
-    getTheme: () => localStorage.getItem('theme') || 'light',
+    getTheme: () => 'dark',
     setTheme: (theme) => {
-        localStorage.setItem('theme', theme);
-        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.setAttribute('data-theme', 'dark');
     }
 };
 
@@ -64,20 +63,4 @@ const Notifications = {
 };
 
 // Initialize Theme
-Storage.setTheme(Storage.getTheme());
-
-// Add Theme Toggle UI
-document.addEventListener('DOMContentLoaded', () => {
-    const header = document.querySelector('header');
-    if (header) {
-        const toggle = createHTMLElement('button', { 
-            className: 'theme-toggle',
-            onclick: () => {
-                const newTheme = Storage.getTheme() === 'light' ? 'dark' : 'light';
-                Storage.setTheme(newTheme);
-                toggle.textContent = newTheme === 'light' ? '🌙' : '☀️';
-            }
-        }, [Storage.getTheme() === 'light' ? '🌙' : '☀️']);
-        header.appendChild(toggle);
-    }
-});
+Storage.setTheme('dark');
