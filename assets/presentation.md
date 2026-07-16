@@ -136,3 +136,17 @@
 "Le système de Swipe est intégré. C'est simple, c'est rapide, et ça répond exactement aux irritants de nos personas."
 
 "Nous avons concentré ce prototype sur notre MVP pour prouver que l'on peut résoudre un problème complexe avec une expérience utilisateur ultra-fluide."
+
+# 🎤 Le script de la conclusion (Slide 10 : Soutenance)
+"Pour conclure, avec Tin-Die, nous n'avons pas seulement appliqué la méthode Agile."
+
+"Nous avons prouvé qu'une approche produit rigoureuse pouvait structurer n'importe quel marché... même les plus mortels."
+
+"En partant d'un vrai problème utilisateur, en assumant nos choix avec un MVP minimaliste, et en nous basant sur des données chiffrées, nous avons créé un service fluide et sécurisé."
+
+"Tin-Die est prêt à être déployé et à disrupter le marché."
+
+"Nous vous remercions pour votre attention."
+
+
+"Nous sommes maintenant à votre disposition pour vos questions... Soyez indulgents, vous savez de quoi notre application est capable."
